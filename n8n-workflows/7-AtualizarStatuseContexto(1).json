@@ -1,0 +1,140 @@
+{
+  "name": "7 - Atualizar Status e Contexto",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "session_id"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "ultimo_contexto",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "16c49ab9-2a44-422e-ae40-e2b580fafe21",
+      "name": "When Called"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO odz_status_atendimento (session_id, status, contexto)\nVALUES (\n  '{{ $json.session_id }}',\n  CASE WHEN '{{ $json.tipo }}' = 'incoming' THEN 'em_atendimento' ELSE 'aguardando' END,\n  jsonb_build_object(\n    'mensagem', COALESCE('{{ $json.mensagem }}', ''),\n    'tipo', COALESCE('{{ $json.tipo }}', 'unknown'),\n    'timestamp', COALESCE('{{ $json.timestamp }}', NOW()),\n    'id_conversa', COALESCE('{{ $json.id_conversa }}', '')\n  )\n)\nON CONFLICT (session_id) \nDO UPDATE SET \n  status = EXCLUDED.status,\n  contexto = EXCLUDED.contexto,\n  updated_at = NOW()",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        112,
+        0
+      ],
+      "id": "3f808a99-e2db-4dbc-bdf9-486f1ff3045c",
+      "name": "Salvar Status",
+      "credentials": {
+        "postgres": {
+          "id": "OKCGuBzk9VhcKjZs",
+          "name": "supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "resultado",
+              "name": "resultado",
+              "value": "=✅ Status atualizado: {{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "session",
+              "name": "session_id",
+              "value": "={{ $json.session_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        0
+      ],
+      "id": "1cf42240-70f7-47d8-a85a-a6498590874b",
+      "name": "Formatar Resposta"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nconsole.log('Dados recebidos:', JSON.stringify(input, null, 2));\n\nconst session_id = input.session_id || null;\nconst status = input.status || 'aguardando';\nconst contexto = input.ultimo_contexto || { criado_por: 'ia', timestamp: new Date().toISOString() };\n\nif (!session_id) {\n  return [{\n    json: {\n      erro: 'session_id não fornecido',\n      input_recebido: input\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    session_id: session_id,\n    status: status,\n    ultimo_contexto: contexto\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "320df770-b9f6-411f-9b29-c4a342d56103",
+      "name": "preparar status"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Called": {
+      "main": [
+        [
+          {
+            "node": "preparar status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salvar Status": {
+      "main": [
+        [
+          {
+            "node": "Formatar Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "preparar status": {
+      "main": [
+        [
+          {
+            "node": "Salvar Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b2150c20-099f-41fc-9ee1-b1d51f778b19",
+  "meta": {
+    "instanceId": "dc95c86e2096c2f11efd24d690608ac05d9d860c99263577664a51cc012be914"
+  },
+  "id": "JBh96oqWszTwxAi3",
+  "tags": []
+}

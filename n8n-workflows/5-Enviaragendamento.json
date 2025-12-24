@@ -1,0 +1,130 @@
+{
+  "name": "5 -  Enviar agendamento",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "mensagem"
+            },
+            {
+              "name": "id_conta"
+            },
+            {
+              "name": "id_conversa"
+            },
+            {
+              "name": "url_chatwoot"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "b895e381-c143-4242-ae1f-56b3cb1aff88",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.casadf.com.br/api/v1/accounts/{{ $json.id_conta }}/conversations/{{ $json.id_conversa }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "chatwootApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.mensagem }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.mensagem }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private\t",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        0
+      ],
+      "id": "f95497c7-7d1f-47f1-826f-21c2097f5ea2",
+      "name": "Enviar mensagem",
+      "credentials": {
+        "chatwootApi": {
+          "id": "L8CPSqYvRj4b4ECX",
+          "name": "ChatWoot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.first().json;\n\nif (!inputs.mensagem || !inputs.id_conversa) {\n  throw new Error('Mensagem ou ID da conversa ausente');\n}\n\n// Limpar caracteres problemáticos\nconst mensagemLimpa = inputs.mensagem\n  .replace(/[\\u{1F300}-\\u{1F9FF}]/gu, '')\n  .trim();\n\nreturn [{\n  json: {\n    ...inputs,\n    mensagem: mensagemLimpa\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "931e5484-fa9a-4e8e-a38d-875c4b959da7",
+      "name": "Validar Inputs"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Validar Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Inputs": {
+      "main": [
+        [
+          {
+            "node": "Enviar mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dadc5945-7cf2-41b6-a5c5-dfc5af4287fe",
+  "meta": {
+    "instanceId": "dc95c86e2096c2f11efd24d690608ac05d9d860c99263577664a51cc012be914"
+  },
+  "id": "fAN5beQfPl9B9BGI",
+  "tags": []
+}
