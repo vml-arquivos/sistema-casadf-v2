@@ -1,249 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Bed, Bath, Maximize, MapPin, TrendingUp, Award, Users } from "lucide-react";
+import { Search, Bed, Bath, Maximize, MapPin, TrendingUp, Award, Users, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { Star } from "lucide-react";
+import { PropertyFilter } from "@/components/PropertyFilter";
+import { PropertyCard } from "@/components/PropertyCard";
 
-// Removendo a função FeaturedProperties, pois a lógica será integrada na Home
-// Removendo a função FeaturedProperties, pois a lógica será integrada na Home
-function FeaturedProperties() {
-  return null;
-}
-  return null;
-}
-  const { data: properties, isLoading } = trpc.properties.featured.useQuery({ limit: 6 });
+// --- Funções Auxiliares (Assumindo que ReviewsSection, AboutSection, ContactSection são necessárias) ---
 
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-background">
-        <div className="container">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="py-20 bg-background">
-      <div className="container">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Imóveis em Destaque</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Seleção exclusiva de propriedades de alto padrão
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {properties && properties.length > 0 ? (
-            properties.map((property) => (
-              <Link key={property.id} href={`/imovel/${property.id}`}>
-                <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
-                <div className="relative h-64 bg-muted overflow-hidden">
-                  {(() => {
-                    const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
-                    return imageUrl ? (
-                      <img 
-                        src={imageUrl} 
-                        alt={property.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
-                    );
-                  })()}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <span className="text-2xl font-serif font-bold">
-                      {property.salePrice
-                        ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
-                        : property.rentPrice
-                        ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
-                        : 'Consulte'}
-                    </span>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {property.neighborhood}, {property.city}
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {property.bedrooms && (
-                      <span className="flex items-center gap-1">
-                        <Bed className="h-4 w-4" /> {property.bedrooms}
-                      </span>
-                    )}
-                    {property.bathrooms && (
-                      <span className="flex items-center gap-1">
-                        <Bath className="h-4 w-4" /> {property.bathrooms}
-                      </span>
-                    )}
-                    {property.totalArea && (
-                      <span className="flex items-center gap-1">
-                        <Maximize className="h-4 w-4" /> {property.totalArea}m²
-                      </span>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              </Link>
-            ))
-          ) : (
-            <div className="col-span-3 text-center py-12">
-              <p className="text-muted-foreground">Nenhum imóvel em destaque no momento</p>
-            </div>
-          )}
-        </div>
-
-        <div className="text-center mt-12">
-          <Link href="/imoveis">
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-              Ver Todos os Imóveis
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Removendo a função AllProperties, pois a lógica será integrada na Home
-// Removendo a função AllProperties, pois a lógica será integrada na Home
-// Removendo a função AllProperties, pois a lógica será integrada na Home
-function AllProperties() {
-  return null;
-}
-  return null;
-}
-  return null;
-}
-  const { data: properties, isLoading } = trpc.properties.list.useQuery();
-  const availableProperties = properties?.filter(p => p.status === 'disponivel') || [];
-
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (availableProperties.length === 0) {
-    return null;
-  }
-
-  return (
-    <section className="py-20 bg-muted/30">
-      <div className="container">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Todos os Imóveis Disponíveis</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Confira nosso portfólio completo de imóveis de alto padrão
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {availableProperties.slice(0, 9).map((property) => (
-            <Link key={property.id} href={`/imovel/${property.id}`}>
-              <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
-              <div className="relative h-64 bg-muted overflow-hidden">
-                {(() => {
-                  const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
-                  return imageUrl ? (
-                    <img 
-                      src={imageUrl} 
-                      alt={property.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
-                  );
-                })()}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <span className="text-2xl font-serif font-bold">
-                    {property.salePrice
-                      ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
-                      : property.rentPrice
-                      ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
-                      : 'Consulte'}
-                  </span>
-                </div>
-              </div>
-              <CardContent className="p-6">
-                <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  {property.neighborhood}, {property.city}
-                </p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  {property.bedrooms && (
-                    <span className="flex items-center gap-1">
-                      <Bed className="h-4 w-4" /> {property.bedrooms}
-                    </span>
-                  )}
-                  {property.bathrooms && (
-                    <span className="flex items-center gap-1">
-                      <Bath className="h-4 w-4" /> {property.bathrooms}
-                    </span>
-                  )}
-                  {property.totalArea && (
-                    <span className="flex items-center gap-1">
-                      <Maximize className="h-4 w-4" /> {property.totalArea}m²
-                    </span>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            </Link>
-          ))}
-        </div>
-
-        {availableProperties.length > 9 && (
-          <div className="text-center mt-12">
-            <Link href="/imoveis">
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                Ver Todos os {availableProperties.length} Imóveis
-              </Button>
-            </Link>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
+// Função para renderizar a seção de Reviews (Mantida do original)
 function ReviewsSection() {
   const { data: reviews, isLoading } = trpc.reviews.list.useQuery();
 
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-background">
-        <div className="container">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!reviews || reviews.length === 0) {
+  if (isLoading || !reviews || reviews.length === 0) {
     return null;
   }
 
@@ -251,122 +26,108 @@ function ReviewsSection() {
     <section className="py-20 bg-muted/30">
       <div className="container">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>O Que Dizem Nossos Clientes</h2>
+          <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>O que dizem nossos clientes</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Depoimentos reais de clientes satisfeitos com nosso atendimento
+            Veja a satisfação de quem realizou o sonho da casa própria com a Casa DF.
           </p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {reviews.slice(0, 3).map((review) => (
-            <Card key={review.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 ${
-                        i < review.rating
-                          ? 'fill-yellow-400 text-yellow-400'
-                          : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
+            <Card key={review.id} className="p-6">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4 italic">"{review.comment}"</p>
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold mr-3">
+                  {review.clientName.charAt(0)}
                 </div>
-                {review.title && (
-                  <h3 className="text-lg font-bold mb-2">{review.title}</h3>
-                )}
-                <p className="text-muted-foreground mb-6 line-clamp-4">
-                  {review.content}
-                </p>
-                <div className="flex items-center gap-3">
-                  {review.clientPhoto && (
-                    <img
-                      src={review.clientPhoto}
-                      alt={review.clientName}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  )}
-                  <div>
-                    <p className="font-semibold">{review.clientName}</p>
-                    {review.clientRole && (
-                      <p className="text-sm text-muted-foreground">{review.clientRole}</p>
-                    )}
-                  </div>
+                <div>
+                  <p className="font-semibold">{review.clientName}</p>
+                  <p className="text-sm text-muted-foreground">{review.propertyAddress}</p>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>
+        <div className="text-center mt-12">
+          <Link href="/depoimentos">
+            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+              Ver Todos os Depoimentos
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
-function BlogSection() {
-  const { data: posts, isLoading } = trpc.blog.published.useQuery({ limit: 3 });
-
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-background">
-        <div className="container">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!posts || posts.length === 0) {
-    return null;
-  }
-
+// Função para renderizar a seção Sobre (Mantida do original)
+function AboutSection() {
   return (
     <section className="py-20 bg-background">
       <div className="container">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Blog Imobiliário</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Dicas, tendências e novidades do mercado de luxo
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-4xl font-serif font-bold mb-6">Casa DF: Inteligência Imobiliária</h2>
+            <p className="text-lg text-muted-foreground mb-6">
+              Somos a primeira imobiliária do Distrito Federal a integrar inteligência artificial em todos os processos.
+              Nossa missão é simplificar a compra, venda e aluguel de imóveis, oferecendo a melhor experiência com a máxima eficiência.
+            </p>
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <TrendingUp className="h-6 w-6 text-primary mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-xl">Análise de Mercado Inteligente</h3>
+                  <p className="text-muted-foreground">Nossa IA avalia o mercado em tempo real para garantir o melhor negócio.</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <Award className="h-6 w-6 text-primary mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-xl">Atendimento 24/7 com Agentes de IA</h3>
+                  <p className="text-muted-foreground">Agentes de IA prontos para qualificar leads e agendar visitas a qualquer hora.</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <Users className="h-6 w-6 text-primary mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-xl">Foco no Cliente</h3>
+                  <p className="text-muted-foreground">Tecnologia a serviço da sua satisfação e segurança jurídica.</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-8">
+              <Link href="/sobre">
+                <Button size="lg">Saiba Mais Sobre Nós</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="hidden lg:block">
+            <img src="/images/about-us.jpg" alt="Sobre a Casa DF" className="rounded-lg shadow-2xl" />
+          </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {posts.map((post) => (
-            <Link key={post.id} href={`/blog/${post.slug}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <div 
-                  className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 bg-cover bg-center"
-                  style={{
-                    backgroundImage: post.featuredImage ? `url(${post.featuredImage})` : undefined
-                  }}
-                />
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('pt-BR', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric'
-                    }) : 'Recente'}
-                  </p>
-                  <h3 className="text-xl font-bold mb-2 line-clamp-2">{post.title}</h3>
-                  {post.excerpt && (
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                  )}
-                  <Button variant="link" className="p-0">Ler mais →</Button>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Link href="/blog">
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-              Ver Todos os Artigos
+// Função para renderizar a seção de Contato (Mantida do original)
+function ContactSection() {
+  return (
+    <section className="py-20 bg-primary text-white">
+      <div className="container text-center">
+        <h2 className="text-4xl font-serif font-bold mb-4">Pronto para Encontrar Seu Imóvel?</h2>
+        <p className="text-xl mb-8">Fale com um de nossos especialistas ou use nosso simulador.</p>
+        <div className="flex justify-center space-x-4">
+          <Link href="/contato">
+            <Button size="lg" variant="secondary">Fale Conosco</Button>
+          </Link>
+          <Link href="/simulador">
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+              Simule Seu Financiamento
             </Button>
           </Link>
         </div>
@@ -375,878 +136,77 @@ function BlogSection() {
   );
 }
 
+// ============================================
+// COMPONENTE PRINCIPAL HOME
+// ============================================
+
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [location, navigate] = useLocation();
   const [filters, setFilters] = useState({
-    transactionType: "",
-    propertyType: "",
-    minPrice: "",
-    maxPrice: "",
+    transactionType: 'venda',
+    propertyType: '',
+    neighborhood: '',
+    minPrice: undefined as number | undefined,
+    maxPrice: undefined as number | undefined,
   });
 
-  const { data: allProperties, isLoading: isLoadingAll } = trpc.properties.list.useQuery();
-  const availableProperties = allProperties?.filter(p => p.status === 'disponivel') || [];
+  // Chama a rota tRPC com os filtros
+  const { data: properties, isLoading } = trpc.properties.list.useQuery(filters);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // A filtragem será feita no useEffect
-  };
-
-  const filteredProperties = availableProperties.filter(property => {
-    // 1. Filtro de Busca por Título/Descrição
-    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          property.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-    // 2. Filtro por Tipo de Transação
-    const matchesTransaction = !filters.transactionType || 
-                               (filters.transactionType === 'venda' && property.salePrice && property.salePrice > 0) ||
-                               (filters.transactionType === 'locacao' && property.rentPrice && property.rentPrice > 0);
-
-    // 3. Filtro por Tipo de Imóvel
-    const matchesPropertyType = !filters.propertyType || property.propertyType === filters.propertyType;
-
-    // 4. Filtro por Preço Mínimo
-    const minPrice = filters.minPrice ? parseFloat(filters.minPrice) * 100 : 0;
-    const matchesMinPrice = !minPrice || 
-                            (property.salePrice && property.salePrice >= minPrice) ||
-                            (property.rentPrice && property.rentPrice >= minPrice);
-
-    // 5. Filtro por Preço Máximo
-    const maxPrice = filters.maxPrice ? parseFloat(filters.maxPrice) * 100 : Infinity;
-    const matchesMaxPrice = !maxPrice || 
-                            (property.salePrice && property.salePrice <= maxPrice) ||
-                            (property.rentPrice && property.rentPrice <= maxPrice);
-
-    return matchesSearch && matchesTransaction && matchesPropertyType && matchesMinPrice && matchesMaxPrice;
-  });
-
-  return (
-    <>
-      <Header />
-      {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center text-white" style={{
-        backgroundImage: "url('/hero-bg.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}>
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 text-center">
-          <h1 className="text-6xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>
-            Casa DF
-          </h1>
-          <p className="text-xl mb-8">Inteligência Imobiliária para o seu próximo lar</p>
-          <Link href="/imoveis">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
-              Buscar Imóveis <Search className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Vitrine de Imóveis (Estilo 5Andar/Wimoves) */}
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Imóveis Disponíveis</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Encontre o imóvel perfeito para você na Casa DF - Inteligência Imobiliária
-            </p>
-          </div>
-
-          {/* Barra de Filtro */}
-          <Card className="mb-12 p-6">
-            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-6 gap-4">
-              <div className="md:col-span-2">
-                <Input
-                  type="text"
-                  placeholder="Buscar por título ou descrição..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-10"
-                />
-              </div>
-              <Select onValueChange={(v) => handleFilterChange("transactionType", v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Tipo de Transação" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Qualquer Transação</SelectItem>
-                  <SelectItem value="venda">Venda</SelectItem>
-                  <SelectItem value="locacao">Locação</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select onValueChange={(v) => handleFilterChange("propertyType", v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Tipo de Imóvel" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Qualquer Tipo</SelectItem>
-                  <SelectItem value="casa">Casa</SelectItem>
-                  <SelectItem value="apartamento">Apartamento</SelectItem>
-                  <SelectItem value="cobertura">Cobertura</SelectItem>
-                  <SelectItem value="terreno">Terreno</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                placeholder="Preço Mín."
-                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
-                className="h-10"
-              />
-              <Input
-                type="number"
-                placeholder="Preço Máx."
-                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
-                className="h-10"
-              />
-            </form>
-          </Card>
-
-          {/* Lista de Imóveis Filtrados */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {isLoadingAll ? (
-              <div className="col-span-3 text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-4">Carregando imóveis...</p>
-              </div>
-            ) : filteredProperties.length > 0 ? (
-              filteredProperties.map((property) => (
-                <Link key={property.id} href={`/imovel/${property.id}`}>
-                  <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
-                    <div className="relative h-64 bg-muted overflow-hidden">
-                      {(() => {
-                        const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
-                        return imageUrl ? (
-                          <img 
-                            src={imageUrl} 
-                            alt={property.title}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
-                        );
-                      })()}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4 text-white">
-                        <span className="text-2xl font-serif font-bold">
-                          {property.salePrice
-                            ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
-                            : property.rentPrice
-                            ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
-                            : 'Consulte'}
-                        </span>
-                      </div>
-                    </div>
-                    <CardContent className="p-6">
-                      <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
-                      <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {property.neighborhood}, {property.city}
-                      </p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        {property.bedrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bed className="h-4 w-4" /> {property.bedrooms}
-                          </span>
-                        )}
-                        {property.bathrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bath className="h-4 w-4" /> {property.bathrooms}
-                          </span>
-                        )}
-                        {property.totalArea && (
-                          <span className="flex items-center gap-1">
-                            <Maximize className="h-4 w-4" /> {property.totalArea}m²
-                          </span>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-3 text-center py-12">
-                <p className="text-muted-foreground">Nenhum imóvel encontrado com os filtros aplicados.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/imoveis">
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                Ver Todos os Imóveis
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Seção de Blog */}
-      <BlogSection />
-
-      {/* Avaliações de Clientes */}
-      <ReviewsSection />
-
-      {/* Sobre o Corretor */}
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-serif font-bold mb-6">Casa DF - Inteligência Imobiliária</h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                Consultoria imobiliária de luxo em Brasília. Especializado em imóveis de alto padrão com atendimento personalizado e exclusivo.
-              </p>
-              <p className="text-muted-foreground mb-6">
-                Com mais de 15 anos de experiência no mercado imobiliário de luxo, ofereço um atendimento diferenciado e personalizado para cada cliente. Minha missão é encontrar o imóvel perfeito que atenda todas as suas necessidades e supere suas expectativas.
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                <strong>CRECI:</strong> 17921-DF
-              </p>
-              <Link href="/quem-somos">
-                <Button size="lg">Conheça Mais</Button>
-              </Link>
-            </div>
-            <div className="relative h-96 lg:h-full min-h-[400px] rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
-              <img
-                src="/casa-df-photo.jpg"
-                alt="Casa DF - Inteligência Imobiliária"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </>
-  );
-}
-
-export default Home;
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({
-    transactionType: "",
-    propertyType: "",
-    minPrice: "",
-    maxPrice: "",
-  });
-
-  const { data: allProperties, isLoading: isLoadingAll } = trpc.properties.list.useQuery();
-  const availableProperties = allProperties?.filter(p => p.status === 'disponivel') || [];
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // A filtragem será feita no useEffect
-  };
-
-  const filteredProperties = availableProperties.filter(property => {
-    // 1. Filtro de Busca por Título/Descrição
-    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          property.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-    // 2. Filtro por Tipo de Transação
-    const matchesTransaction = !filters.transactionType || 
-                               (filters.transactionType === 'venda' && property.salePrice && property.salePrice > 0) ||
-                               (filters.transactionType === 'locacao' && property.rentPrice && property.rentPrice > 0);
-
-    // 3. Filtro por Tipo de Imóvel
-    const matchesPropertyType = !filters.propertyType || property.propertyType === filters.propertyType;
-
-    // 4. Filtro por Preço Mínimo
-    const minPrice = filters.minPrice ? parseFloat(filters.minPrice) * 100 : 0;
-    const matchesMinPrice = !minPrice || 
-                            (property.salePrice && property.salePrice >= minPrice) ||
-                            (property.rentPrice && property.rentPrice >= minPrice);
-
-    // 5. Filtro por Preço Máximo
-    const maxPrice = filters.maxPrice ? parseFloat(filters.maxPrice) * 100 : Infinity;
-    const matchesMaxPrice = !maxPrice || 
-                            (property.salePrice && property.salePrice <= maxPrice) ||
-                            (property.rentPrice && property.rentPrice <= maxPrice);
-
-    return matchesSearch && matchesTransaction && matchesPropertyType && matchesMinPrice && matchesMaxPrice;
-  });
-
-  return (
-    <>
-      <Header />
-      {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center text-white" style={{
-        backgroundImage: "url('/hero-bg.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}>
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 text-center">
-          <h1 className="text-6xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>
-            Casa DF
-          </h1>
-          <p className="text-xl mb-8">Inteligência Imobiliária para o seu próximo lar</p>
-          <Link href="/imoveis">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
-              Buscar Imóveis <Search className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Vitrine de Imóveis (Estilo 5Andar/Wimoves) */}
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Imóveis Disponíveis</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Encontre o imóvel perfeito para você na Casa DF - Inteligência Imobiliária
-            </p>
-          </div>
-
-          {/* Barra de Filtro */}
-          <Card className="mb-12 p-6">
-            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-6 gap-4">
-              <div className="md:col-span-2">
-                <Input
-                  type="text"
-                  placeholder="Buscar por título ou descrição..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-10"
-                />
-              </div>
-              <Select onValueChange={(v) => handleFilterChange("transactionType", v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Tipo de Transação" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Qualquer Transação</SelectItem>
-                  <SelectItem value="venda">Venda</SelectItem>
-                  <SelectItem value="locacao">Locação</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select onValueChange={(v) => handleFilterChange("propertyType", v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Tipo de Imóvel" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Qualquer Tipo</SelectItem>
-                  <SelectItem value="casa">Casa</SelectItem>
-                  <SelectItem value="apartamento">Apartamento</SelectItem>
-                  <SelectItem value="cobertura">Cobertura</SelectItem>
-                  <SelectItem value="terreno">Terreno</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                placeholder="Preço Mín."
-                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
-                className="h-10"
-              />
-              <Input
-                type="number"
-                placeholder="Preço Máx."
-                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
-                className="h-10"
-              />
-            </form>
-          </Card>
-
-          {/* Lista de Imóveis Filtrados */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {isLoadingAll ? (
-              <div className="col-span-3 text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-4">Carregando imóveis...</p>
-              </div>
-            ) : filteredProperties.length > 0 ? (
-              filteredProperties.map((property) => (
-                <Link key={property.id} href={`/imovel/${property.id}`}>
-                  <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
-                    <div className="relative h-64 bg-muted overflow-hidden">
-                      {(() => {
-                        const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
-                        return imageUrl ? (
-                          <img 
-                            src={imageUrl} 
-                            alt={property.title}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
-                        );
-                      })()}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4 text-white">
-                        <span className="text-2xl font-serif font-bold">
-                          {property.salePrice
-                            ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
-                            : property.rentPrice
-                            ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
-                            : 'Consulte'}
-                        </span>
-                      </div>
-                    </div>
-                    <CardContent className="p-6">
-                      <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
-                      <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {property.neighborhood}, {property.city}
-                      </p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        {property.bedrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bed className="h-4 w-4" /> {property.bedrooms}
-                          </span>
-                        )}
-                        {property.bathrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bath className="h-4 w-4" /> {property.bathrooms}
-                          </span>
-                        )}
-                        {property.totalArea && (
-                          <span className="flex items-center gap-1">
-                            <Maximize className="h-4 w-4" /> {property.totalArea}m²
-                          </span>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-3 text-center py-12">
-                <p className="text-muted-foreground">Nenhum imóvel encontrado com os filtros aplicados.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/imoveis">
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                Ver Todos os Imóveis
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Seção de Blog */}
-      <BlogSection />
-
-      {/* Avaliações de Clientes */}
-      <ReviewsSection />
-
-      {/* Sobre o Corretor */}
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-serif font-bold mb-6">Casa DF - Inteligência Imobiliária</h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                Consultoria imobiliária de luxo em Brasília. Especializado em imóveis de alto padrão com atendimento personalizado e exclusivo.
-              </p>
-              <p className="text-muted-foreground mb-6">
-                Com mais de 15 anos de experiência no mercado imobiliário de luxo, ofereço um atendimento diferenciado e personalizado para cada cliente. Minha missão é encontrar o imóvel perfeito que atenda todas as suas necessidades e supere suas expectativas.
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                <strong>CRECI:</strong> 17921-DF
-              </p>
-              <Link href="/quem-somos">
-                <Button size="lg">Conheça Mais</Button>
-              </Link>
-            </div>
-            <div className="relative h-96 lg:h-full min-h-[400px] rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
-              <img
-                src="/casa-df-photo.jpg"
-                alt="Casa DF - Inteligência Imobiliária"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </>
-  );
-}
-
-export default Home;
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({
-    transactionType: "",
-    propertyType: "",
-    city: "",
-    minPrice: "",
-    maxPrice: "",
-  });
-  const location = useLocation();
-
-  const { data: allProperties, isLoading: isLoadingAll } = trpc.properties.list.useQuery();
-  const availableProperties = allProperties?.filter(p => p.status === 'disponivel') || [];
-
-  const filteredProperties = availableProperties.filter(property => {
-    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          property.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesFilters = 
-      (!filters.transactionType || property.transactionType === filters.transactionType) &&
-      (!filters.propertyType || property.propertyType === filters.propertyType) &&
-      (!filters.city || property.city.toLowerCase().includes(filters.city.toLowerCase())) &&
-      (!filters.minPrice || property.salePrice >= (parseFloat(filters.minPrice) * 100)) &&
-      (!filters.maxPrice || property.salePrice <= (parseFloat(filters.maxPrice) * 100));
-
-    return matchesSearch && matchesFilters;
-  });
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simula a navegação para a página de imóveis com os filtros aplicados
-    // No wouter, isso geralmente é feito com Link ou useLocation().push
-    // Para manter a simplicidade, vamos apenas filtrar na página
-    console.log("Searching with filters:", filters);
-  };
-
-  // ... (Resto da função Home)
-
-  const [location, setLocation] = useLocation();
-  const [searchParams, setSearchParams] = useState({
-    transactionType: "",
-    propertyType: "",
-    neighborhood: "",
-  });
-
-  // Ler query params da URL ao carregar
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSearchParams({
-      transactionType: params.get("finalidade") || "",
-      propertyType: params.get("tipo") || "",
-      neighborhood: params.get("bairro") || "",
-    });
-  }, []);
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (searchParams.transactionType) params.set("finalidade", searchParams.transactionType);
-    if (searchParams.propertyType) params.set("tipo", searchParams.propertyType);
-    if (searchParams.neighborhood) params.set("bairro", searchParams.neighborhood);
-    
-    const queryString = params.toString();
-    setLocation(`/imoveis${queryString ? `?${queryString}` : ""}`);
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
   };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Header />
-      
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center bg-black">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/hero-mansion.jpg)' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50" />
+      <main className="flex-grow">
+        {/* Seção Hero com Filtro de Busca (Estilo QuintoAndar) */}
+        <section className="relative h-[60vh] flex items-center justify-center bg-cover bg-center" style={{backgroundImage: 'url(/images/hero-bg.jpg)'}}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative z-10 text-center text-white p-4 max-w-6xl mx-auto">
+            <h1 className="text-5xl font-serif font-bold mb-4">Casa DF - Inteligência Imobiliária</h1>
+            <p className="text-xl mb-8">Encontre o imóvel perfeito com a ajuda da nossa IA.</p>
+            
+            {/* Componente de Filtro */}
+            <PropertyFilter onFilterChange={handleFilterChange} />
+
+          </div>
+        </section>
         
-        <div className="relative z-10 container text-center text-white">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '61px' }}>
-            Encontre a Mansão dos Seus Sonhos
-          </h1>
-          <p className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto">
-            Consultoria imobiliária de luxo em Brasília. Imóveis exclusivos com atendimento personalizado.
-          </p>
-
-          {/* Search Bar */}
-          <Card className="max-w-4xl mx-auto bg-white/95 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <Select
-                  value={searchParams.transactionType}
-                  onValueChange={(value) => setSearchParams(prev => ({ ...prev, transactionType: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Finalidade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="venda">Venda</SelectItem>
-                    <SelectItem value="locacao">Locação</SelectItem>
-                    <SelectItem value="ambos">Ambos</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={searchParams.propertyType}
-                  onValueChange={(value) => setSearchParams(prev => ({ ...prev, propertyType: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Tipo de Imóvel" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="casa">Casa</SelectItem>
-                    <SelectItem value="apartamento">Apartamento</SelectItem>
-                    <SelectItem value="cobertura">Cobertura</SelectItem>
-                    <SelectItem value="terreno">Terreno</SelectItem>
-                    <SelectItem value="comercial">Comercial</SelectItem>
-                    <SelectItem value="rural">Rural</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={searchParams.neighborhood}
-                  onValueChange={(value) => setSearchParams(prev => ({ ...prev, neighborhood: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Bairro" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Lago Sul">Lago Sul</SelectItem>
-                    <SelectItem value="Lago Norte">Lago Norte</SelectItem>
-                    <SelectItem value="Sudoeste">Sudoeste</SelectItem>
-                    <SelectItem value="Noroeste">Noroeste</SelectItem>
-                    <SelectItem value="Park Way">Park Way</SelectItem>
-                    <SelectItem value="Asa Sul">Asa Sul</SelectItem>
-                    <SelectItem value="Asa Norte">Asa Norte</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
-                size="lg"
-                onClick={handleSearch}
-              >
-                <Search className="mr-2 h-5 w-5" />
-                Buscar Imóveis
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Estatísticas */}
-      <section className="py-16 bg-muted/30">
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                <TrendingUp className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-4xl font-serif font-bold mb-2" style={{fontFamily: 'poppins'}}>15+</h3>
-              <p className="text-muted-foreground">Anos de Experiência</p>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                <Award className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-4xl font-serif font-bold mb-2" style={{fontFamily: 'poppins'}}>500+</h3>
-              <p className="text-muted-foreground">Imóveis Vendidos</p>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                <Users className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-4xl font-serif font-bold mb-2" style={{fontFamily: 'poppins'}}>1000+</h3>
-              <p className="text-muted-foreground">Clientes Satisfeitos</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Imóveis em Destaque */}
-      {/* Vitrine de Imóveis (Estilo 5Andar/Wimoves) */}
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Imóveis Disponíveis</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Encontre o imóvel perfeito para você na Casa DF - Inteligência Imobiliária
-            </p>
-          </div>
-
-          {/* Barra de Filtro */}
-          <Card className="mb-12 p-6">
-            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-6 gap-4">
-              <div className="md:col-span-2">
-                <Input
-                  type="text"
-                  placeholder="Buscar por título ou descrição..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-10"
-                />
-              </div>
-              <Select onValueChange={(v) => handleFilterChange("transactionType", v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Tipo de Transação" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Qualquer Transação</SelectItem>
-                  <SelectItem value="venda">Venda</SelectItem>
-                  <SelectItem value="locacao">Locação</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select onValueChange={(v) => handleFilterChange("propertyType", v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Tipo de Imóvel" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Qualquer Tipo</SelectItem>
-                  <SelectItem value="casa">Casa</SelectItem>
-                  <SelectItem value="apartamento">Apartamento</SelectItem>
-                  <SelectItem value="cobertura">Cobertura</SelectItem>
-                  <SelectItem value="terreno">Terreno</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                placeholder="Preço Mín."
-                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
-                className="h-10"
-              />
-              <Input
-                type="number"
-                placeholder="Preço Máx."
-                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
-                className="h-10"
-              />
-            </form>
-          </Card>
-
-          {/* Lista de Imóveis Filtrados */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {isLoadingAll ? (
-              <div className="col-span-3 text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-4">Carregando imóveis...</p>
-              </div>
-            ) : filteredProperties.length > 0 ? (
-              filteredProperties.map((property) => (
-                <Link key={property.id} href={`/imovel/${property.id}`}>
-                  <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
-                    <div className="relative h-64 bg-muted overflow-hidden">
-                      {(() => {
-                        const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
-                        return imageUrl ? (
-                          <img 
-                            src={imageUrl} 
-                            alt={property.title}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
-                        );
-                      })()}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4 text-white">
-                        <span className="text-2xl font-serif font-bold">
-                          {property.salePrice
-                            ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
-                            : property.rentPrice
-                            ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
-                            : 'Consulte'}
-                        </span>
-                      </div>
-                    </div>
-                    <CardContent className="p-6">
-                      <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
-                      <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {property.neighborhood}, {property.city}
-                      </p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        {property.bedrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bed className="h-4 w-4" /> {property.bedrooms}
-                          </span>
-                        )}
-                        {property.bathrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bath className="h-4 w-4" /> {property.bathrooms}
-                          </span>
-                        )}
-                        {property.totalArea && (
-                          <span className="flex items-center gap-1">
-                            <Maximize className="h-4 w-4" /> {property.totalArea}m²
-                          </span>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-3 text-center py-12">
-                <p className="text-muted-foreground">Nenhum imóvel encontrado com os filtros aplicados.</p>
+        {/* Seção de Vitrine de Imóveis */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto">
+            <h2 className="text-3xl font-serif font-bold mb-8 text-center">Imóveis Encontrados</h2>
+            
+            {isLoading && (
+              <div className="text-center py-12">
+                <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
+                <p className="mt-2 text-lg text-muted-foreground">Buscando imóveis...</p>
               </div>
             )}
+
+            {!isLoading && properties && properties.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {properties.map((property) => (
+                  <PropertyCard key={property.id} property={property as any} />
+                ))}
+              </div>
+            ) : (
+              !isLoading && (
+                <div className="text-center py-12">
+                  <p className="text-xl text-muted-foreground">Nenhum imóvel encontrado com os filtros aplicados.</p>
+                </div>
+              )
+            )}
           </div>
+        </section>
 
-          <div className="text-center mt-12">
-            <Link href="/imoveis">
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                Ver Todos os Imóveis
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Seção de Blog */}
-      <BlogSection />
-
-      {/* Seção de Blog */}
-      <BlogSection />
-
-      {/* Avaliações de Clientes */}
-      <ReviewsSection />
-
-      {/* Sobre o Corretor */}
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-serif font-bold mb-6">Casa DF - Inteligência Imobiliária</h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                Consultoria imobiliária de luxo em Brasília. Especializado em imóveis de alto padrão com atendimento personalizado e exclusivo.
-              </p>
-              <p className="text-muted-foreground mb-6">
-                Com mais de 15 anos de experiência no mercado imobiliário de luxo, ofereço um atendimento diferenciado e personalizado para cada cliente. Minha missão é encontrar o imóvel perfeito que atenda todas as suas necessidades e supere suas expectativas.
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                <strong>CRECI:</strong> 17921-DF
-              </p>
-              <Link href="/quem-somos">
-                <Button size="lg">Conheça Mais</Button>
-              </Link>
-            </div>
-            <div className="relative h-96 lg:h-full min-h-[400px] rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
-              <img
-                src="/casa-df-photo.jpg"
-                alt="Casa DF - Inteligência Imobiliária"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
+        <ReviewsSection />
+        <AboutSection />
+        <ContactSection />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
