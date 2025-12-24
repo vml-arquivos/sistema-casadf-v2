@@ -1,4 +1,4 @@
-# 🏰 Corretor das Mansões - Hernani Muniz
+# 🏰 Casa DF - Inteligência Imobiliária - Casa DF
 
 Sistema completo de consultoria imobiliária de luxo em Brasília com CRM integrado, automação via WhatsApp e gestão de imóveis.
 
@@ -83,7 +83,7 @@ Sistema completo de consultoria imobiliária de luxo em Brasília com CRM integr
 ## 📁 Estrutura do Projeto
 
 ```
-corretordasmansoes/
+casadf/
 ├── client/                    # Frontend React
 │   ├── public/               # Assets estáticos
 │   ├── src/
@@ -142,8 +142,8 @@ corretordasmansoes/
 
 1. **Clone o repositório:**
 ```bash
-git clone https://github.com/seu-usuario/corretordasmansoes.git
-cd corretordasmansoes
+git clone https://github.com/seu-usuario/casadf.git
+cd casadf
 ```
 
 2. **Instale as dependências:**
@@ -363,7 +363,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👤 Autor
 
-**Hernani Muniz**
+**Casa DF**
 - CRECI: 17921-DF
 - Email: ernanisimiao@hotmail.com
 - Telefone: (61) 3254-4464
@@ -371,9 +371,9 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 🆘 Suporte
 
-- **Issues:** https://github.com/seu-usuario/corretordasmansoes/issues
-- **Email:** suporte@corretordasmansoes.com.br
-- **Documentação:** https://docs.corretordasmansoes.com.br
+- **Issues:** https://github.com/seu-usuario/casadf/issues
+- **Email:** suporte@casadf.com.br
+- **Documentação:** https://docs.casadf.com.br
 
 ## 📚 Documentação Adicional
 

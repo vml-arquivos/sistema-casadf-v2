@@ -1,7 +1,7 @@
 import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, decimal, json, date } from "drizzle-orm/mysql-core";
 
 /**
- * Schema completo para o sistema Corretor das Mansões
+ * Schema completo para o sistema Casa DF - Inteligência Imobiliária
  * Inclui: usuários, imóveis, leads, interações, blog, configurações
  */
 
@@ -588,6 +588,81 @@ export const commissions = mysqlTable("commissions", {
 
 export type Commission = typeof commissions.$inferSelect;
 export type InsertCommission = typeof commissions.$inferInsert;
+
+// ============================================
+// ============================================
+// TABELA DE SIMULAÇÕES DE FINANCIAMENTO
+// ============================================
+
+export const financeSimulations = mysqlTable("financeSimulations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Dados do Cliente
+  name: varchar("name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  
+  // Dados do Imóvel
+  propertyId: int("propertyId"), // Imóvel desejado (opcional)
+  propertyType: varchar("propertyType", { length: 50 }),
+  propertyLocation: varchar("propertyLocation", { length: 255 }),
+  propertyValue: int("propertyValue").notNull(), // Valor total do imóvel (em centavos)
+  
+  // Dados da Simulação
+  downPayment: int("downPayment").notNull(), // Valor de entrada (em centavos)
+  loanAmount: int("loanAmount").notNull(), // Valor do financiamento (em centavos)
+  interestRate: decimal("interestRate", { precision: 5, scale: 3 }), // Taxa de juros anual
+  termMonths: int("termMonths"), // Prazo em meses
+  monthlyPaymentEstimate: int("monthlyPaymentEstimate"), // Estimativa da parcela (em centavos)
+  
+  // Status e Atribuição
+  status: mysqlEnum("status", ["novo", "processando", "contatado", "arquivado"]).default("novo").notNull(),
+  assignedTo: int("assignedTo"), // ID do usuário responsável
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FinanceSimulation = typeof financeSimulations.$inferSelect;
+export type InsertFinanceSimulation = typeof financeSimulations.$inferInsert;
+
+// ============================================
+// ============================================
+// TABELA DE AVALIAÇÕES DE IMÓVEIS
+// ============================================
+
+export const propertyValuations = mysqlTable("propertyValuations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Dados do Cliente
+  name: varchar("name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  
+  // Dados do Imóvel
+  propertyType: varchar("propertyType", { length: 50 }).notNull(),
+  neighborhood: varchar("neighborhood", { length: 100 }).notNull(),
+  totalArea: int("totalArea").notNull(), // em m²
+  bedrooms: int("bedrooms"),
+  bathrooms: int("bathrooms"),
+  condition: mysqlEnum("condition", ["excelente", "bom", "regular", "necessita_reforma"]).notNull(),
+  
+  // Resultado da Avaliação
+  estimatedValueMin: int("estimatedValueMin"), // em centavos
+  estimatedValueMax: int("estimatedValueMax"), // em centavos
+  
+  // Status e Atribuição
+  status: mysqlEnum("status", ["novo", "processando", "contatado", "arquivado"]).default("novo").notNull(),
+  assignedTo: int("assignedTo"), // ID do usuário responsável
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PropertyValuation = typeof propertyValuations.$inferSelect;
+export type InsertPropertyValuation = typeof propertyValuations.$inferInsert;
 
 // ============================================
 // TABELA DE AVALIAÇÕES DE CLIENTES

@@ -3,6 +3,8 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { qualifyLead } from "./services/qualification";
+import { financeRouter } from "./routers/financeRouter"; // Novo import
+import { valuationRouter } from "./routers/valuationRouter"; // Novo import
 import { z } from "zod";
 import * as db from "./db";
 import { getDb } from "./db";
@@ -888,7 +890,7 @@ const integrationRouter = router({
             state: p.state,
             mainImage: p.mainImage,
             referenceCode: p.referenceCode,
-            url: `https://corretordasmansoes.com/imovel/${p.id}`,
+            url: `https://casadf.com/imovel/${p.id}`,
           })),
         };
       } catch (error: any) {
@@ -1445,6 +1447,8 @@ export const appRouter = router({
   leads: leadsRouter,
   interactions: interactionsRouter,
   blog: blogRouter,
+  finance: financeRouter, // Nova rota para simulação de financiamento
+  valuation: valuationRouter, // Nova rota para avaliação de imóveis
   settings: settingsRouter,
   owners: ownersRouter,
   integration: integrationRouter,

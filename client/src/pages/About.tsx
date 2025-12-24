@@ -74,12 +74,12 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>Quem Somos - Hernani Muniz | Corretor de Imóveis de Luxo em Brasília</title>
+        <title>Quem Somos - Casa DF | Corretor de Imóveis de Luxo em Brasília</title>
         <meta 
           name="description" 
-          content="Conheça Hernani Muniz, especialista em imóveis de luxo em Brasília com mais de 15 anos de experiência. CRECI-DF, atendimento personalizado e resultados comprovados." 
+          content="Conheça Casa DF, especialista em imóveis de luxo em Brasília com mais de 15 anos de experiência. CRECI-DF, atendimento personalizado e resultados comprovados." 
         />
-        <meta property="og:title" content="Quem Somos - Hernani Muniz | Corretor de Imóveis de Luxo" />
+        <meta property="og:title" content="Quem Somos - Casa DF | Corretor de Imóveis de Luxo" />
         <meta property="og:description" content="Mais de 15 anos de experiência no mercado de imóveis de luxo em Brasília. Especialista em Lago Sul, Lago Norte e Park Way." />
         <meta property="og:type" content="website" />
       </Helmet>
@@ -95,7 +95,7 @@ export default function About() {
                 Mais de 15 anos de experiência
               </Badge>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                Hernani Muniz
+                Casa DF
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground mb-8">
                 Especialista em Imóveis de Luxo em Brasília
@@ -133,7 +133,7 @@ export default function About() {
               <div>
                 <img
                   src="/ernani-nunes-photo.jpg"
-                  alt="Hernani Muniz - Corretor de Imóveis de Luxo"
+                  alt="Casa DF - Corretor de Imóveis de Luxo"
                   className="w-full rounded-2xl shadow-2xl"
                 />
               </div>

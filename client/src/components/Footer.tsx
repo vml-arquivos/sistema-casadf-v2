@@ -160,7 +160,7 @@ export default function Footer() {
         <div className="border-t border-background/10 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-background/60">
             <p>
-              © {currentYear} Ernani Nunes - O Corretor das Mansões. Todos os direitos reservados.
+              © {currentYear} Ernani Nunes - O Casa DF - Inteligência Imobiliária. Todos os direitos reservados.
             </p>
             <div className="flex gap-6">
               <Link href="/privacidade">

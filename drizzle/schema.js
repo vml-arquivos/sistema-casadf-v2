@@ -1,6 +1,6 @@
 import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
 /**
- * Schema completo para o sistema Corretor das Mansões
+ * Schema completo para o sistema Casa DF - Inteligência Imobiliária
  * Inclui: usuários, imóveis, leads, interações, blog, configurações
  */
 // ============================================

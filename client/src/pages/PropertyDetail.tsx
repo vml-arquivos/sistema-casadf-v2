@@ -129,7 +129,7 @@ export default function PropertyDetail() {
   const seoTitle = `${property.title} - Ernani Nunes Corretor`;
   const seoDescription = property.description?.substring(0, 160) || `${property.propertyType} para ${property.transactionType} em ${property.neighborhood}, ${property.city}. ${price}.`;
   const seoImage = property.mainImage || allImages[0] || 'https://placehold.co/1200x630';
-  const seoUrl = `https://corretordasmansoes.com/imovel/${property.id}`;
+  const seoUrl = `https://casadf.com/imovel/${property.id}`;
 
   return (
     <>

@@ -426,6 +426,32 @@ export async function upsertLeadFromWhatsApp(data: {
 // INTERACTION FUNCTIONS
 // ============================================
 
+// ============================================
+// FINANCE SIMULATION FUNCTIONS
+// ============================================
+
+export async function createFinanceSimulation(simulation: InsertFinanceSimulation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(financeSimulations).values(simulation).returning({ id: financeSimulations.id });
+  const insertId = result[0].id;
+  const created = await getFinanceSimulationById(insertId);
+  return created!;
+}
+
+export async function getFinanceSimulationById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.select().from(financeSimulations).where(eq(financeSimulations.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+// ============================================
+// INTERACTION FUNCTIONS
+// ============================================
+
 export async function createInteraction(interaction: InsertInteraction) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

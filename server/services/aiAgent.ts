@@ -1,6 +1,7 @@
 import { invokeLLM, Message, ToolCall } from "../_core/llm";
 import * as db from "../db";
-import { aiTools, searchProperties } from "../tools/propertySearch";
+import { aiTools as searchTools, searchProperties } from "../tools/propertySearch";
+import { aiTools as scheduleTools, scheduleVisit } from "../tools/scheduleVisit";
 import { Lead } from "../../drizzle/schema";
 
 // ============================================
@@ -83,9 +84,10 @@ export async function processIncomingMessage(
   ];
 
   // 3. Invocar o LLM (Primeira Chamada)
+  const allTools = [searchTools.scheduleVisit.definition, scheduleTools.scheduleVisit.definition];
   let response = await invokeLLM({
     messages,
-    tools: [aiTools.searchProperties.definition],
+    tools: allTools,
     toolChoice: "auto",
   });
 
@@ -114,6 +116,16 @@ export async function processIncomingMessage(
           tool_call_id: toolCall.id,
           content: toolResult,
         });
+      } else if (toolName === "scheduleVisit") {
+        // Executar a Tool
+        const toolResult = await scheduleVisit(toolArgs.propertyId, toolArgs.date, phone);
+        
+        // Adicionar o resultado da tool ao histórico
+        messages.push({
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: toolResult,
+        });
       } else {
         // Tratar tool desconhecida
         messages.push({
@@ -127,7 +139,7 @@ export async function processIncomingMessage(
     // 5. Invocar o LLM (Segunda Chamada - com resultado da Tool)
     response = await invokeLLM({
       messages,
-      tools: [aiTools.searchProperties.definition],
+      tools: allTools,
       toolChoice: "auto",
     });
   }

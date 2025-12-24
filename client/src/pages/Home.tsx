@@ -10,7 +10,13 @@ import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { Star } from "lucide-react";
 
+// Removendo a função FeaturedProperties, pois a lógica será integrada na Home
+// Removendo a função FeaturedProperties, pois a lógica será integrada na Home
 function FeaturedProperties() {
+  return null;
+}
+  return null;
+}
   const { data: properties, isLoading } = trpc.properties.featured.useQuery({ limit: 6 });
 
   if (isLoading) {
@@ -111,7 +117,16 @@ function FeaturedProperties() {
   );
 }
 
+// Removendo a função AllProperties, pois a lógica será integrada na Home
+// Removendo a função AllProperties, pois a lógica será integrada na Home
+// Removendo a função AllProperties, pois a lógica será integrada na Home
 function AllProperties() {
+  return null;
+}
+  return null;
+}
+  return null;
+}
   const { data: properties, isLoading } = trpc.properties.list.useQuery();
   const availableProperties = properties?.filter(p => p.status === 'disponivel') || [];
 
@@ -361,6 +376,553 @@ function BlogSection() {
 }
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    transactionType: "",
+    propertyType: "",
+    minPrice: "",
+    maxPrice: "",
+  });
+
+  const { data: allProperties, isLoading: isLoadingAll } = trpc.properties.list.useQuery();
+  const availableProperties = allProperties?.filter(p => p.status === 'disponivel') || [];
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // A filtragem será feita no useEffect
+  };
+
+  const filteredProperties = availableProperties.filter(property => {
+    // 1. Filtro de Busca por Título/Descrição
+    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          property.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // 2. Filtro por Tipo de Transação
+    const matchesTransaction = !filters.transactionType || 
+                               (filters.transactionType === 'venda' && property.salePrice && property.salePrice > 0) ||
+                               (filters.transactionType === 'locacao' && property.rentPrice && property.rentPrice > 0);
+
+    // 3. Filtro por Tipo de Imóvel
+    const matchesPropertyType = !filters.propertyType || property.propertyType === filters.propertyType;
+
+    // 4. Filtro por Preço Mínimo
+    const minPrice = filters.minPrice ? parseFloat(filters.minPrice) * 100 : 0;
+    const matchesMinPrice = !minPrice || 
+                            (property.salePrice && property.salePrice >= minPrice) ||
+                            (property.rentPrice && property.rentPrice >= minPrice);
+
+    // 5. Filtro por Preço Máximo
+    const maxPrice = filters.maxPrice ? parseFloat(filters.maxPrice) * 100 : Infinity;
+    const matchesMaxPrice = !maxPrice || 
+                            (property.salePrice && property.salePrice <= maxPrice) ||
+                            (property.rentPrice && property.rentPrice <= maxPrice);
+
+    return matchesSearch && matchesTransaction && matchesPropertyType && matchesMinPrice && matchesMaxPrice;
+  });
+
+  return (
+    <>
+      <Header />
+      {/* Hero Section */}
+      <section className="relative h-[60vh] flex items-center justify-center text-white" style={{
+        backgroundImage: "url('/hero-bg.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center">
+          <h1 className="text-6xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>
+            Casa DF
+          </h1>
+          <p className="text-xl mb-8">Inteligência Imobiliária para o seu próximo lar</p>
+          <Link href="/imoveis">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
+              Buscar Imóveis <Search className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Vitrine de Imóveis (Estilo 5Andar/Wimoves) */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Imóveis Disponíveis</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Encontre o imóvel perfeito para você na Casa DF - Inteligência Imobiliária
+            </p>
+          </div>
+
+          {/* Barra de Filtro */}
+          <Card className="mb-12 p-6">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-6 gap-4">
+              <div className="md:col-span-2">
+                <Input
+                  type="text"
+                  placeholder="Buscar por título ou descrição..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-10"
+                />
+              </div>
+              <Select onValueChange={(v) => handleFilterChange("transactionType", v)}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Tipo de Transação" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Qualquer Transação</SelectItem>
+                  <SelectItem value="venda">Venda</SelectItem>
+                  <SelectItem value="locacao">Locação</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={(v) => handleFilterChange("propertyType", v)}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Tipo de Imóvel" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Qualquer Tipo</SelectItem>
+                  <SelectItem value="casa">Casa</SelectItem>
+                  <SelectItem value="apartamento">Apartamento</SelectItem>
+                  <SelectItem value="cobertura">Cobertura</SelectItem>
+                  <SelectItem value="terreno">Terreno</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                type="number"
+                placeholder="Preço Mín."
+                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
+                className="h-10"
+              />
+              <Input
+                type="number"
+                placeholder="Preço Máx."
+                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
+                className="h-10"
+              />
+            </form>
+          </Card>
+
+          {/* Lista de Imóveis Filtrados */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {isLoadingAll ? (
+              <div className="col-span-3 text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-4">Carregando imóveis...</p>
+              </div>
+            ) : filteredProperties.length > 0 ? (
+              filteredProperties.map((property) => (
+                <Link key={property.id} href={`/imovel/${property.id}`}>
+                  <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
+                    <div className="relative h-64 bg-muted overflow-hidden">
+                      {(() => {
+                        const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
+                        return imageUrl ? (
+                          <img 
+                            src={imageUrl} 
+                            alt={property.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
+                        );
+                      })()}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-4 left-4 text-white">
+                        <span className="text-2xl font-serif font-bold">
+                          {property.salePrice
+                            ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
+                            : property.rentPrice
+                            ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
+                            : 'Consulte'}
+                        </span>
+                      </div>
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
+                      <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        {property.neighborhood}, {property.city}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        {property.bedrooms && (
+                          <span className="flex items-center gap-1">
+                            <Bed className="h-4 w-4" /> {property.bedrooms}
+                          </span>
+                        )}
+                        {property.bathrooms && (
+                          <span className="flex items-center gap-1">
+                            <Bath className="h-4 w-4" /> {property.bathrooms}
+                          </span>
+                        )}
+                        {property.totalArea && (
+                          <span className="flex items-center gap-1">
+                            <Maximize className="h-4 w-4" /> {property.totalArea}m²
+                          </span>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-muted-foreground">Nenhum imóvel encontrado com os filtros aplicados.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/imoveis">
+              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                Ver Todos os Imóveis
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de Blog */}
+      <BlogSection />
+
+      {/* Avaliações de Clientes */}
+      <ReviewsSection />
+
+      {/* Sobre o Corretor */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl font-serif font-bold mb-6">Casa DF - Inteligência Imobiliária</h2>
+              <p className="text-lg text-muted-foreground mb-6">
+                Consultoria imobiliária de luxo em Brasília. Especializado em imóveis de alto padrão com atendimento personalizado e exclusivo.
+              </p>
+              <p className="text-muted-foreground mb-6">
+                Com mais de 15 anos de experiência no mercado imobiliário de luxo, ofereço um atendimento diferenciado e personalizado para cada cliente. Minha missão é encontrar o imóvel perfeito que atenda todas as suas necessidades e supere suas expectativas.
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                <strong>CRECI:</strong> 17921-DF
+              </p>
+              <Link href="/quem-somos">
+                <Button size="lg">Conheça Mais</Button>
+              </Link>
+            </div>
+            <div className="relative h-96 lg:h-full min-h-[400px] rounded-lg overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
+              <img
+                src="/casa-df-photo.jpg"
+                alt="Casa DF - Inteligência Imobiliária"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </>
+  );
+}
+
+export default Home;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    transactionType: "",
+    propertyType: "",
+    minPrice: "",
+    maxPrice: "",
+  });
+
+  const { data: allProperties, isLoading: isLoadingAll } = trpc.properties.list.useQuery();
+  const availableProperties = allProperties?.filter(p => p.status === 'disponivel') || [];
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // A filtragem será feita no useEffect
+  };
+
+  const filteredProperties = availableProperties.filter(property => {
+    // 1. Filtro de Busca por Título/Descrição
+    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          property.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // 2. Filtro por Tipo de Transação
+    const matchesTransaction = !filters.transactionType || 
+                               (filters.transactionType === 'venda' && property.salePrice && property.salePrice > 0) ||
+                               (filters.transactionType === 'locacao' && property.rentPrice && property.rentPrice > 0);
+
+    // 3. Filtro por Tipo de Imóvel
+    const matchesPropertyType = !filters.propertyType || property.propertyType === filters.propertyType;
+
+    // 4. Filtro por Preço Mínimo
+    const minPrice = filters.minPrice ? parseFloat(filters.minPrice) * 100 : 0;
+    const matchesMinPrice = !minPrice || 
+                            (property.salePrice && property.salePrice >= minPrice) ||
+                            (property.rentPrice && property.rentPrice >= minPrice);
+
+    // 5. Filtro por Preço Máximo
+    const maxPrice = filters.maxPrice ? parseFloat(filters.maxPrice) * 100 : Infinity;
+    const matchesMaxPrice = !maxPrice || 
+                            (property.salePrice && property.salePrice <= maxPrice) ||
+                            (property.rentPrice && property.rentPrice <= maxPrice);
+
+    return matchesSearch && matchesTransaction && matchesPropertyType && matchesMinPrice && matchesMaxPrice;
+  });
+
+  return (
+    <>
+      <Header />
+      {/* Hero Section */}
+      <section className="relative h-[60vh] flex items-center justify-center text-white" style={{
+        backgroundImage: "url('/hero-bg.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center">
+          <h1 className="text-6xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>
+            Casa DF
+          </h1>
+          <p className="text-xl mb-8">Inteligência Imobiliária para o seu próximo lar</p>
+          <Link href="/imoveis">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
+              Buscar Imóveis <Search className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Vitrine de Imóveis (Estilo 5Andar/Wimoves) */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Imóveis Disponíveis</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Encontre o imóvel perfeito para você na Casa DF - Inteligência Imobiliária
+            </p>
+          </div>
+
+          {/* Barra de Filtro */}
+          <Card className="mb-12 p-6">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-6 gap-4">
+              <div className="md:col-span-2">
+                <Input
+                  type="text"
+                  placeholder="Buscar por título ou descrição..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-10"
+                />
+              </div>
+              <Select onValueChange={(v) => handleFilterChange("transactionType", v)}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Tipo de Transação" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Qualquer Transação</SelectItem>
+                  <SelectItem value="venda">Venda</SelectItem>
+                  <SelectItem value="locacao">Locação</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={(v) => handleFilterChange("propertyType", v)}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Tipo de Imóvel" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Qualquer Tipo</SelectItem>
+                  <SelectItem value="casa">Casa</SelectItem>
+                  <SelectItem value="apartamento">Apartamento</SelectItem>
+                  <SelectItem value="cobertura">Cobertura</SelectItem>
+                  <SelectItem value="terreno">Terreno</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                type="number"
+                placeholder="Preço Mín."
+                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
+                className="h-10"
+              />
+              <Input
+                type="number"
+                placeholder="Preço Máx."
+                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
+                className="h-10"
+              />
+            </form>
+          </Card>
+
+          {/* Lista de Imóveis Filtrados */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {isLoadingAll ? (
+              <div className="col-span-3 text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-4">Carregando imóveis...</p>
+              </div>
+            ) : filteredProperties.length > 0 ? (
+              filteredProperties.map((property) => (
+                <Link key={property.id} href={`/imovel/${property.id}`}>
+                  <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
+                    <div className="relative h-64 bg-muted overflow-hidden">
+                      {(() => {
+                        const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
+                        return imageUrl ? (
+                          <img 
+                            src={imageUrl} 
+                            alt={property.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
+                        );
+                      })()}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-4 left-4 text-white">
+                        <span className="text-2xl font-serif font-bold">
+                          {property.salePrice
+                            ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
+                            : property.rentPrice
+                            ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
+                            : 'Consulte'}
+                        </span>
+                      </div>
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
+                      <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        {property.neighborhood}, {property.city}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        {property.bedrooms && (
+                          <span className="flex items-center gap-1">
+                            <Bed className="h-4 w-4" /> {property.bedrooms}
+                          </span>
+                        )}
+                        {property.bathrooms && (
+                          <span className="flex items-center gap-1">
+                            <Bath className="h-4 w-4" /> {property.bathrooms}
+                          </span>
+                        )}
+                        {property.totalArea && (
+                          <span className="flex items-center gap-1">
+                            <Maximize className="h-4 w-4" /> {property.totalArea}m²
+                          </span>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-muted-foreground">Nenhum imóvel encontrado com os filtros aplicados.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/imoveis">
+              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                Ver Todos os Imóveis
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de Blog */}
+      <BlogSection />
+
+      {/* Avaliações de Clientes */}
+      <ReviewsSection />
+
+      {/* Sobre o Corretor */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl font-serif font-bold mb-6">Casa DF - Inteligência Imobiliária</h2>
+              <p className="text-lg text-muted-foreground mb-6">
+                Consultoria imobiliária de luxo em Brasília. Especializado em imóveis de alto padrão com atendimento personalizado e exclusivo.
+              </p>
+              <p className="text-muted-foreground mb-6">
+                Com mais de 15 anos de experiência no mercado imobiliário de luxo, ofereço um atendimento diferenciado e personalizado para cada cliente. Minha missão é encontrar o imóvel perfeito que atenda todas as suas necessidades e supere suas expectativas.
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                <strong>CRECI:</strong> 17921-DF
+              </p>
+              <Link href="/quem-somos">
+                <Button size="lg">Conheça Mais</Button>
+              </Link>
+            </div>
+            <div className="relative h-96 lg:h-full min-h-[400px] rounded-lg overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
+              <img
+                src="/casa-df-photo.jpg"
+                alt="Casa DF - Inteligência Imobiliária"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </>
+  );
+}
+
+export default Home;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    transactionType: "",
+    propertyType: "",
+    city: "",
+    minPrice: "",
+    maxPrice: "",
+  });
+  const location = useLocation();
+
+  const { data: allProperties, isLoading: isLoadingAll } = trpc.properties.list.useQuery();
+  const availableProperties = allProperties?.filter(p => p.status === 'disponivel') || [];
+
+  const filteredProperties = availableProperties.filter(property => {
+    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          property.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesFilters = 
+      (!filters.transactionType || property.transactionType === filters.transactionType) &&
+      (!filters.propertyType || property.propertyType === filters.propertyType) &&
+      (!filters.city || property.city.toLowerCase().includes(filters.city.toLowerCase())) &&
+      (!filters.minPrice || property.salePrice >= (parseFloat(filters.minPrice) * 100)) &&
+      (!filters.maxPrice || property.salePrice <= (parseFloat(filters.maxPrice) * 100));
+
+    return matchesSearch && matchesFilters;
+  });
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simula a navegação para a página de imóveis com os filtros aplicados
+    // No wouter, isso geralmente é feito com Link ou useLocation().push
+    // Para manter a simplicidade, vamos apenas filtrar na página
+    console.log("Searching with filters:", filters);
+  };
+
+  // ... (Resto da função Home)
+
   const [location, setLocation] = useLocation();
   const [searchParams, setSearchParams] = useState({
     transactionType: "",
@@ -505,10 +1067,147 @@ export default function Home() {
       </section>
 
       {/* Imóveis em Destaque */}
-      <FeaturedProperties />
+      {/* Vitrine de Imóveis (Estilo 5Andar/Wimoves) */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-serif font-bold mb-4" style={{fontFamily: 'montserrat'}}>Imóveis Disponíveis</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Encontre o imóvel perfeito para você na Casa DF - Inteligência Imobiliária
+            </p>
+          </div>
 
-      {/* Todos os Imóveis */}
-      <AllProperties />
+          {/* Barra de Filtro */}
+          <Card className="mb-12 p-6">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-6 gap-4">
+              <div className="md:col-span-2">
+                <Input
+                  type="text"
+                  placeholder="Buscar por título ou descrição..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-10"
+                />
+              </div>
+              <Select onValueChange={(v) => handleFilterChange("transactionType", v)}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Tipo de Transação" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Qualquer Transação</SelectItem>
+                  <SelectItem value="venda">Venda</SelectItem>
+                  <SelectItem value="locacao">Locação</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={(v) => handleFilterChange("propertyType", v)}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Tipo de Imóvel" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Qualquer Tipo</SelectItem>
+                  <SelectItem value="casa">Casa</SelectItem>
+                  <SelectItem value="apartamento">Apartamento</SelectItem>
+                  <SelectItem value="cobertura">Cobertura</SelectItem>
+                  <SelectItem value="terreno">Terreno</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                type="number"
+                placeholder="Preço Mín."
+                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
+                className="h-10"
+              />
+              <Input
+                type="number"
+                placeholder="Preço Máx."
+                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
+                className="h-10"
+              />
+            </form>
+          </Card>
+
+          {/* Lista de Imóveis Filtrados */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {isLoadingAll ? (
+              <div className="col-span-3 text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-4">Carregando imóveis...</p>
+              </div>
+            ) : filteredProperties.length > 0 ? (
+              filteredProperties.map((property) => (
+                <Link key={property.id} href={`/imovel/${property.id}`}>
+                  <Card className="overflow-hidden group hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
+                    <div className="relative h-64 bg-muted overflow-hidden">
+                      {(() => {
+                        const imageUrl = property.mainImage || (property.images ? JSON.parse(property.images)[0]?.url : null);
+                        return imageUrl ? (
+                          <img 
+                            src={imageUrl} 
+                            alt={property.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} />
+                        );
+                      })()}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-4 left-4 text-white">
+                        <span className="text-2xl font-serif font-bold">
+                          {property.salePrice
+                            ? `R$ ${(property.salePrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
+                            : property.rentPrice
+                            ? `R$ ${(property.rentPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês`
+                            : 'Consulte'}
+                        </span>
+                      </div>
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-serif font-bold mb-2">{property.title}</h3>
+                      <p className="text-muted-foreground text-sm mb-4 flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        {property.neighborhood}, {property.city}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        {property.bedrooms && (
+                          <span className="flex items-center gap-1">
+                            <Bed className="h-4 w-4" /> {property.bedrooms}
+                          </span>
+                        )}
+                        {property.bathrooms && (
+                          <span className="flex items-center gap-1">
+                            <Bath className="h-4 w-4" /> {property.bathrooms}
+                          </span>
+                        )}
+                        {property.totalArea && (
+                          <span className="flex items-center gap-1">
+                            <Maximize className="h-4 w-4" /> {property.totalArea}m²
+                          </span>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-muted-foreground">Nenhum imóvel encontrado com os filtros aplicados.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/imoveis">
+              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                Ver Todos os Imóveis
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de Blog */}
+      <BlogSection />
 
       {/* Seção de Blog */}
       <BlogSection />
@@ -521,7 +1220,7 @@ export default function Home() {
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-serif font-bold mb-6">Ernani Nunes</h2>
+              <h2 className="text-4xl font-serif font-bold mb-6">Casa DF - Inteligência Imobiliária</h2>
               <p className="text-lg text-muted-foreground mb-6">
                 Consultoria imobiliária de luxo em Brasília. Especializado em imóveis de alto padrão com atendimento personalizado e exclusivo.
               </p>
@@ -538,8 +1237,8 @@ export default function Home() {
             <div className="relative h-96 lg:h-full min-h-[400px] rounded-lg overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
               <img
-                src="/ernani-nunes-photo.jpg"
-                alt="Ernani Nunes - O Corretor das Mansões"
+                src="/casa-df-photo.jpg"
+                alt="Casa DF - Inteligência Imobiliária"
                 className="w-full h-full object-cover"
               />
             </div>

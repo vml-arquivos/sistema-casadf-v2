@@ -75,7 +75,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/">
             <div className="flex items-center gap-3 cursor-pointer">
-              <img src="/logo-ernani-nunes.jpg" alt="Ernani Nunes - O Corretor das Mansões" className="h-16 w-auto" />
+              <img src="/logo-ernani-nunes.jpg" alt="Ernani Nunes - O Casa DF - Inteligência Imobiliária" className="h-16 w-auto" />
             </div>
           </Link>
 
