@@ -3,7 +3,8 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { qualifyLead } from "./services/qualification";
-import { financeRouter } from "./routers/financeRouter"; // Novo import
+import { financeRouter } from "./routers/financeRouter";
+import { valuationRouter } from "./routers/valuationRouter"; // Novo import
 import { valuationRouter } from "./routers/valuationRouter"; // Novo import
 import { z } from "zod";
 import * as db from "./db";
@@ -1447,7 +1448,8 @@ export const appRouter = router({
   leads: leadsRouter,
   interactions: interactionsRouter,
   blog: blogRouter,
-  finance: financeRouter, // Nova rota para simulação de financiamento
+  finance: financeRouter,
+  valuation: valuationRouter, // Nova rota para simulação de financiamento
   valuation: valuationRouter, // Nova rota para avaliação de imóveis
   settings: settingsRouter,
   owners: ownersRouter,

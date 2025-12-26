@@ -427,6 +427,26 @@ export async function upsertLeadFromWhatsApp(data: {
 // ============================================
 
 // ============================================
+// PROPERTY VALUATION FUNCTIONS
+// ============================================
+
+export async function createPropertyValuation(data: Omit<InsertPropertyValuation, 'createdAt'>): Promise<PropertyValuation> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const insertData: InsertPropertyValuation = {
+    ...data,
+    createdAt: new Date(),
+  };
+
+  const result = await db.insert(propertyValuations).values(insertData).returning({ id: propertyValuations.id });
+  const newId = result[0].id;
+  const newValuation = await db.select().from(propertyValuations).where(eq(propertyValuations.id, newId)).limit(1);
+  if (!newValuation[0]) throw new Error("Failed to create property valuation record");
+  return newValuation[0];
+}
+
+// ============================================
 // FINANCE SIMULATION FUNCTIONS
 // ============================================
 
